@@ -58,15 +58,6 @@ system.add_electrode_matrix(h0 = np.array([e0]), hi = np.array([vi]),vmol = np.a
 system.add_electrode_matrix(h0 = np.array([e0]), hi = np.array([vi]),vmol = np.array([0,0,vmol,0,0,0]))
 ```
 
-The ```Elecrode``` class allow to easily compute the band structure of the electrodes via the ```band_structure(nK,nE,filename)``` method. Here ```nK``` an ```nE```  are the number of points to be used in K and energy space respectively. ```filename``` specify the .png file where the band structure is plotted.
-
-```python
-# compute the band structure of the electrode
-system.electrodes['0'].band_structure(nK = 250, nE=250, filename='bandstructure_0.png')
-```
-
-![band structure](./pics/tb/bandstructure_0.png)
-
 ### Computing the transmission with ESQC
 
 ESQC or Ellastic Scattering Quantum Chemistry is a powerfull method to compute the electronic transmission of molecular junction. We have used here the formalism defined in the references 
