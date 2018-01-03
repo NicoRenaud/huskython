@@ -15,6 +15,14 @@ The installation will compile the huckel dynamic library. For that you must have
 
 Once the installation is done you can use the module as in the following example. In this example we compute the transmission of a 'benzene' molecule using simple electrodes containing only one states per unit cell. 
 
+![junction](./pics/tb/junction.png)
+
+Husky allows to compute the electronic transmission of this system (and any other systems defined similarly) using different theoretical framework. For example the ESQC and NEGF transmission calculated with Husky of the system above is represented below.
+
+![te](./pics/tb/te.png)
+
+As we can see below the ESQC results agree with NEGF calculation including the SGF of the elecrodes. However the WBL approximation leads to slightly different results as expeced. One can also clearly see the quantum interference around E=0 that are so typical of this system.
+
 ### Defining the junction geometry
 
 Before doing any simulation on the transport we need to define the junction geomerty. We need to import the ```Junction``` class defined in ```husky.hamiltonian.ElectronicSystem```. Some basic definition of tight-binding hamiltonian are defined in ```husky.hamiltonian.model``` as for example cyclic armoatic molecules. We can add the hamiltonian of the central part with the ```add_central_matrix(h0)```
@@ -151,6 +159,5 @@ plt.savefig('te.png')
 
 ```
 
-As we can see below the ESQC results agree with NEGF calculation including the SGF of the elecrodes. However the WBL approximation leads to slightly different results as expeced. One can also clearly see the quantum interference around E=0 that are so typical of this system.
 
-![te](./pics/tb/te.png)
+
