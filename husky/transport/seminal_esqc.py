@@ -15,7 +15,6 @@
 # 		=============== WARNING =============== ================================
 #			THIS CLASS ONLY WORK FOR  ELECTRODES WITH UNIT CELLS OF SIZE 1
 #			DONT KNOW WHY THOUGH AND IT SHOULD BE FIXABLE
-#		 	USE THE ESQC_RD FOR LARGE ELECTRODES
 # 		=============== ------- =============== ================================
 #
 #
@@ -25,8 +24,7 @@ import numpy as np
 import scipy.linalg as spla
 import sys
 import warnings
-#from ..hamiltonian.ElectronicSystem import Junction
-#warnings.filterwarnings("error")
+
 
 np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)

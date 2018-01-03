@@ -72,7 +72,7 @@ class ESQCsolver(object):
 		elec.udiag = u
 
 	def diagonalize_all_electrodes(self):
-		for index, elec in self.junction.electrodes.iteritems():
+		for index, elec in self.junction.electrodes.items():
 			if elec.norb>1:
 				self.diagonalize_electrode(elec)
 
@@ -85,11 +85,9 @@ class ESQCsolver(object):
 		self.junction.central_region.s0 = np.eye(self.junction.central_region.norb)
 		self.junction.central_region.udiag = u
 
- 		for index, elec in self.junction.electrodes.iteritems():
+		for index, elec in self.junction.electrodes.items():
 			elec.vmol = np.dot(elec.vmol,u)	
 			elec.smol = np.dot(elec.smol,u)	
-
-
 
 	# get the propagator pf the electrode
 	def get_electrode_propagator(self,ielec=0,E=0):
@@ -105,7 +103,7 @@ class ESQCsolver(object):
 		if np.linalg.cond(hi) < 1./np.finfo(hi.dtype).eps: 
 			invHi = spla.inv(hi)
 		else:
-			print '\n -> Warning : Interaction matrix between electrode cell ill conditionned'
+			print('\n -> Warning : Interaction matrix between electrode cell ill conditionned')
 			U,s,Vh = spla.svd(hi)
 			invHi = np.dot(U,np.dot(np.diag(1./s),Vh))
 			if not self.force:
@@ -126,8 +124,8 @@ class ESQCsolver(object):
 		elec.L = L[sort_index]
 		elec.U = U[:,sort_index]
 		elec.channels = channels
-		elec.index_in = range(elec.norb)
-		elec.index_out = range(elec.norb,elec.norb*2)
+		elec.index_in = list(range(elec.norb))
+		elec.index_out = list(range(elec.norb,elec.norb*2))
 
 		# store the propagating channels
 		elec.prop_channel = np.array(prop)
@@ -144,7 +142,7 @@ class ESQCsolver(object):
 		l = np.copy(L)
 		n = len(l)
 		channels = []
-		miss = range(n)
+		miss = list(range(n))
 
 		# find the pairs that respect lp=1./lm^*
 		for i in range(n):
@@ -184,15 +182,15 @@ class ESQCsolver(object):
 					# print for debug
 					if _debug_:
 
-						print '\n---- Channel %d ----\n' %(i+1)
-						print ' -> %s' %c.type
-						print ' -> index : %d    %d'    %(c.index[0],      c.index[1])
-						print ' -> eigen : {:.3E} {:.3E}'.format(c.eigen[0],      c.eigen[1])
-						print ' -> inveg : {:.3E} {:.3E}'.format(c.inveigen[0],   c.inveigen[1])
-						print ' -> norm  : %1.3E %1.3E' %(c.abs[0],        c.abs[1])
-						print ' -> phase : %1.3f %1.3f' %(c.phase[0],      c.phase[1])
+						print('\n---- Channel %d ----\n' %(i+1))
+						print(' -> %s' %c.type)
+						print(' -> index : %d    %d'    %(c.index[0],      c.index[1]))
+						print(' -> eigen : {:.3E} {:.3E}'.format(c.eigen[0],      c.eigen[1]))
+						print(' -> inveg : {:.3E} {:.3E}'.format(c.inveigen[0],   c.inveigen[1]))
+						print(' -> norm  : %1.3E %1.3E' %(c.abs[0],        c.abs[1]))
+						print(' -> phase : %1.3f %1.3f' %(c.phase[0],      c.phase[1]))
 						#print ' -> diff  : %1.3E %1.3E' %(np.abs(c.eigen[0]-1./c.eigen[1]),np.abs(c.eigen[1]-1./c.eigen[0]))
-						print ' -> rdiff : %1.3E %1.3E' %( rdiff1,rdiff2)
+						print(' -> rdiff : %1.3E %1.3E' %( rdiff1,rdiff2))
 
 					# delete the index from the list
 					miss.remove(i)
@@ -208,17 +206,17 @@ class ESQCsolver(object):
 		nmiss = len(miss)
 		if nmiss > 0:
 
-			print ''
-			print '='*60
-			print '==  Warning : %d/%d  conduction channels are corrputed' %(nmiss,len(L))
-			print '='*60
+			print('')
+			print('='*60)
+			print('==  Warning : %d/%d  conduction channels are corrputed' %(nmiss,len(L)))
+			print('='*60)
 
 			l = np.array(L[miss])
 			mat = np.abs(l-1./l[:,np.newaxis])
 			mat += mat.T
 			#mat += float('inf')*np.eye(nmiss)
 
-			for i in range(nmiss/2):
+			for i in range(int(nmiss/2)):
 
 				row_min,col_min = np.unravel_index(mat.argmin(),mat.shape)
 
@@ -243,14 +241,14 @@ class ESQCsolver(object):
 				# print for debug
 				if _debug_:
 
-					print '\n---- Fixed Channel %d ----\n' %(i+1)
-					print ' -> %s' %c.type
-					print ' -> index : %d    %d'    %(c.index[0],      c.index[1])
-					print ' -> eigen : {:.3E} {:.3E}'.format(c.eigen[0],      c.eigen[1])
-					print ' -> inveg : {:.3E} {:.3E}'.format(c.inveigen[0],   c.inveigen[1])
-					print ' -> norm  : %1.3E %1.3E' %(c.abs[0],        c.abs[1])
-					print ' -> phase : %1.3f %1.3f' %(c.phase[0],      c.phase[1])
-					print ' -> rdiff  : % 1.3E %1.3E' %( np.abs(c.eigen[0]-1./c.eigen[1])/c.abs[0],np.abs(c.eigen[1]-1./c.eigen[0])/c.abs[1])
+					print('\n---- Fixed Channel %d ----\n' %(i+1))
+					print(' -> %s' %c.type)
+					print(' -> index : %d    %d'    %(c.index[0],      c.index[1]))
+					print(' -> eigen : {:.3E} {:.3E}'.format(c.eigen[0],      c.eigen[1]))
+					print(' -> inveg : {:.3E} {:.3E}'.format(c.inveigen[0],   c.inveigen[1]))
+					print(' -> norm  : %1.3E %1.3E' %(c.abs[0],        c.abs[1]))
+					print(' -> phase : %1.3f %1.3f' %(c.phase[0],      c.phase[1]))
+					print(' -> rdiff  : % 1.3E %1.3E' %( np.abs(c.eigen[0]-1./c.eigen[1])/c.abs[0],np.abs(c.eigen[1]-1./c.eigen[0])/c.abs[1]))
 
 			if not _force_:
 				sys.exit()
@@ -349,8 +347,8 @@ class ESQCsolver(object):
 		U = spla.block_diag(self.junction.electrodes[str(ielec1)].U,self.junction.electrodes[str(ielec2)].U,Imol)
 
 		# indexes
-		index_out = range(nelec1,2*nelec1)+range(2*nelec1+nelec2,2*nelec1+2*nelec2+nmol)
-		index_in = range(nelec1)+range(2*nelec1,2*nelec1+nelec2)
+		index_out = list(range(nelec1,2*nelec1))+list(range(2*nelec1+nelec2,2*nelec1+2*nelec2+nmol))
+		index_in = list(range(nelec1))+list(range(2*nelec1,2*nelec1+nelec2))
 
 		# transform the matrix
 		S = np.dot(self.Meff,U)
@@ -401,19 +399,19 @@ class ESQCsolver(object):
 			
 			
 			
-		print ' - Transmission computed in %1.3f sec. ' %(time.time()-t0)
+		print(' - Transmission computed in %1.3f sec. ' %(time.time()-t0))
 		return te
 
 	# print the detail of the calculation
 	def print_intro(self):
-		print '\n'
-		print '='*40
-		print '= Ellastic Scattering Quantum Chemistry Solver'
-		print '= N. Renaud 2017'
-		print '='*40
-		print ''
-		print ' - Energy range % 1.3f % 1.3f %d points' %(self.energies[0],self.energies[-1],len(self.energies))
-		print ' - Compute Transmission'
+		print('\n')
+		print('='*40)
+		print('= Ellastic Scattering Quantum Chemistry Solver')
+		print('= N. Renaud 2017')
+		print('='*40)
+		print('')
+		print(' - Energy range % 1.3f % 1.3f %d points' %(self.energies[0],self.energies[-1],len(self.energies)))
+		print(' - Compute Transmission')
 
 
 

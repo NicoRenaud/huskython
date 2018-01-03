@@ -1,9 +1,9 @@
 import os
 import numpy as np
 import ase.io 
-from huckel import hkl_module as hkl
-from huckel.transform import lowdin
-from huckel.orbitals import print_mo_mopac
+from .huckel import hkl_module as hkl
+from .huckel.transform import lowdin
+from .huckel.orbitals import print_mo_mopac
 import scipy.linalg as spla
 import time 
 
@@ -84,17 +84,17 @@ class Electrode(object):
 
 		self.sgf = []
 		t0 = time.time()
-		print ' - Compute surface green fuction of the electrode'
+		print(' - Compute surface green fuction of the electrode')
 		for iE,e in enumerate(tqdm(energies,ncols=50,desc='   ',leave=True)):
 			self.sgf.append(self.compute_green_function(e,eps=eps,tol=tol,itermax=itermax))
-		print ' - Surface Green function computed in %1.3f sec. ' %(time.time()-t0)
+		print(' - Surface Green function computed in %1.3f sec. ' %(time.time()-t0))
 		self.plot_surface_green_function(energies)
 
 	# compute the green function for one given energy
 	def compute_green_function(self,E,eps=1E-2,tol=1E-8,itermax=5000):
 
 		if self.hi is None:
-			print "Interaction between layers not defined. Can't compute the green function of the electrode"
+			print("Interaction between layers not defined. Can't compute the green function of the electrode")
 			return
 
 		# init the GF
@@ -110,7 +110,7 @@ class Electrode(object):
 			niter += 1
 
 		if niter==itermax:
-			print 'Surface green function has not converged after %d iterations.\nEnergy % 1.3f err/tol = % 1.3E/% 1.3E' %(itermax,E,err,tol)
+			print('Surface green function has not converged after %d iterations.\nEnergy % 1.3f err/tol = % 1.3E/% 1.3E' %(itermax,E,err,tol))
 		
 		
 		return green
@@ -127,10 +127,10 @@ class Electrode(object):
 		# otherwise we linearly interpolate the sgf
 		ind = np.searchsorted(self.sgf_energies,E)
 		if ind == 0:
-			print 'warning: Interpolation of the SGF outside precomputed range'
+			print('warning: Interpolation of the SGF outside precomputed range')
 			return self.sgf[0]
 		elif ind == len(self.sgf_energies):
-			print 'warning: Interpolation of the SGF outside precomputed range'
+			print('warning: Interpolation of the SGF outside precomputed range')
 			return self.sgf[-1]
 		else:
 			alpha = (E-self.sgf_energies[ind])/(self.sgf_energies[ind+1]-self.sgf_energies[ind])
@@ -158,7 +158,7 @@ class Electrode(object):
 	def compute_bands(self,nK = 100):
 		
 		if self.hi is None:
-			print "Interaction between layers not defined. Can't cpmpute the bands"
+			print("Interaction between layers not defined. Can't cpmpute the bands")
 			return
 
 		self.K = np.linspace(0,np.pi,nK)
@@ -173,11 +173,11 @@ class Electrode(object):
 		self.nbands = len(self.bands)
 		self.nK = nK
 
-	# compute the densitu of states 
+	# compute the density of states 
 	def compute_dos(self,nE=100):
 
 		if self.bands == []:
-			print "The band structure is missing. Can't compute the DOS"
+			print("The band structure is missing. Can't compute the DOS")
 			return			
 
 		emin,emax = np.amin(self.bands),np.amax(self.bands)
@@ -189,7 +189,7 @@ class Electrode(object):
 		if self.nbands==1:
 			invdE = np.asmatrix(1./(np.gradient(self.bands[0],dK)))
 		else:
-			invdE = 1./((np.gradient(self.bands,dK,edge_order=2))[0])
+			invdE = 1./(np.gradient(self.bands,dK,edge_order=2,axis=1))
 
 		for iE in range(self.nbands):
 			for iK in range(self.nK):
@@ -340,7 +340,7 @@ class Junction(object):
 			nat = len(xyz) 
 			for iat in range(nat):
 				at = xyz[iat].symbol
-				x,y,z = map(float,xyz.positions[iat,:])
+				x,y,z = list(map(float,xyz.positions[iat,:]))
 				f.write('%s\t% f\t% f\t% f\n' %(at,x,y,z) )
 
 		#write the molecule positions
@@ -349,7 +349,7 @@ class Junction(object):
 			nat = len(xyz)
 			for iat in range(nat):
 				at = xyz[iat].symbol
-				x,y,z = map(float,xyz.positions[iat,:])
+				x,y,z = list(map(float,xyz.positions[iat,:]))
 				f.write('%s\t% f\t% f\t% f\n' %(at,x,y,z) )
 		f.close()
 
@@ -447,7 +447,7 @@ class Junction(object):
 	########################################
 	def precompute_electrodes_surface_green_function(self,energies,eps=1E-2,tol=1E-8,itermax=5000,filename='surface_gf.png',identical_electrodes=True):
 		first_electrode = True
-		for index, elec in self.electrodes.iteritems():
+		for index, elec in self.electrodes.items():
 			if first_electrode:
 				elec.surface_green_function(energies,eps=eps,tol=tol,itermax=itermax,filename=filename)
 				elec.sgf_energies = energies
@@ -467,7 +467,7 @@ class Junction(object):
 		sgf = np.loadtxt(sgf_filename)
 		energies = np.loadtxt(sgf_energies_filename)
 		if ielec==None:
-			for index, elec in self.electrodes.iteritems():
+			for index, elec in self.electrodes.items():
 				elec.sgf_energies = energies
 				elec.sgf = sgf
 		else:
@@ -488,25 +488,25 @@ class Junction(object):
 	########################################
 	def compute_matrices_huckel(self,KHT=1.75,lowdin_ortho=False,print_mo=True,clean=True):
 
-
-
 		# compute the orbitals of the molecules and orbitals
-		hkl_temp = '__hkl_temp.in'
+		# ubuntu needs bytes but I'm not sure if OSX does too
+		# if error in OSX change from bytes to string
+		hkl_temp = b"__hkl_temp.in"
 		nborb_tot = 0
 		
 		for i in range(self.nelec):
 			hkl.writeInputFileFragment(self.electrodes[str(i)].xyz,self.hkl_param_file,hkl_temp,KHT)
-			norb_frag = hkl.nbOrb(hkl_temp)/2
+			norb_frag = int(hkl.nbOrb(hkl_temp)/2)
 			self.electrodes[str(i)].norb = norb_frag
-			self.electrodes[str(i)].index_orb[0] = (range(nborb_tot,nborb_tot+norb_frag))
-			self.electrodes[str(i)].index_orb[1] = (range(nborb_tot+norb_frag,nborb_tot+2*norb_frag))
+			self.electrodes[str(i)].index_orb[0] = (list(range(nborb_tot,nborb_tot+norb_frag)))
+			self.electrodes[str(i)].index_orb[1] = (list(range(nborb_tot+norb_frag,nborb_tot+2*norb_frag)))
 			nborb_tot += 2*norb_frag
 
 		for i in range(self.nmol):
 			hkl.writeInputFileFragment(self.molecules[str(i)].xyz,self.hkl_param_file,hkl_temp,KHT)
 			norb_frag = hkl.nbOrb(hkl_temp)
 			self.molecules[str(i)].norb = norb_frag
-			self.molecules[str(i)].index_orb = range(nborb_tot,nborb_tot+norb_frag)
+			self.molecules[str(i)].index_orb = list(range(nborb_tot,nborb_tot+norb_frag))
 			nborb_tot += norb_frag
 
 		# extract the total molecular matrices

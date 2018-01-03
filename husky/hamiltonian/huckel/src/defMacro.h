@@ -3,7 +3,7 @@
 #include <string.h>
 #include <tgmath.h>
 #include <time.h>
-#include <cblas.h>
+
 
 #ifndef _defMacro_H
 

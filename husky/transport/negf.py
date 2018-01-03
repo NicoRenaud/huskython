@@ -80,20 +80,20 @@ class NEGFsolver(object):
 			temp = np.trace(np.dot(m1,m2))
 			te[iE] = np.sqrt((temp*np.conj(temp)).real)
 
-		print ' - Transmission computed in %1.3f sec. ' %(time.time()-t0)
+		print(' - Transmission computed in %1.3f sec. ' %(time.time()-t0))
 		return te
 
 	# print the detail of the calculation
 	def print_intro(self):
-		print '\n'
-		print '='*40
-		print '= Non Equilibrium Green Function Solver'
-		print '= N. Renaud 2017'
-		print '='*40
-		print ''
-		print ' - Energy range % 1.3f % 1.3f %d points' %(self.energies[0],self.energies[-1],len(self.energies))
-		print ' - Wide Band Limit Approximation ', self.wide_band_limit
-		print ' - Compute Transmission'
+		print('\n')
+		print('='*40)
+		print('= Non Equilibrium Green Function Solver')
+		print('= N. Renaud 2017')
+		print('='*40)
+		print('')
+		print(' - Energy range % 1.3f % 1.3f %d points' %(self.energies[0],self.energies[-1],len(self.energies)))
+		print(' - Wide Band Limit Approximation ', self.wide_band_limit)
+		print(' - Compute Transmission')
 
 	# compute the transmission from [2]
 	def compute_transmission_sos(self,ielec1=0,ielec2=1):
@@ -188,7 +188,7 @@ class NEGFsolver(object):
 				nIter += 1
 
 				if (nIter >= iterMax):
-					print " Green function not converged : error = %e\n" %change 
+					print(" Green function not converged : error = %e\n" %change) 
 
 			
 			# compute the spectral function

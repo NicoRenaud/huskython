@@ -1244,8 +1244,6 @@ void compute_huckel_hamiltonian_general(double *hmat, double *smat, int nb_orb_p
 	no_orbitals=indexi;
 
 /************************************************/
-	
-	
 	// little check
 	if(no_orbitals != nb_orb_precomp)
 		printf(" warning precomputed %d orbitals and found %d\n",nb_orb_precomp,no_orbitals);

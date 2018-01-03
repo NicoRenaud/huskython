@@ -20,7 +20,7 @@ system = Junction()
 # for the elecrode we here specify only the first cell 
 # and the translation vector to automatically 
 # generate the second cell
-system.add_molecule_xyz('./mol.xyz')
+system.add_molecule_xyz("./mol.xyz")
 
 #system.add_electrode_xyz('./elec1.xyz',trans=[-7.0667673,0,0])
 #system.add_electrode_xyz('./elec2.xyz',trans=[+7.0667673,0,0])
@@ -28,8 +28,8 @@ system.add_molecule_xyz('./mol.xyz')
 #system.add_electrode_xyz('./elec1_2unit.xyz')#,trans=[-7.0667673*2,0,0])
 #system.add_electrode_xyz('./elec2_2unit.xyz')#,trans=[+7.0667673*2,0,0])
 
-system.add_electrode_xyz('elec1_1atom.xyz')#,trans=[0,0,-5])
-system.add_electrode_xyz('elec2_1atom.xyz')#,trans=[0,0,5])
+system.add_electrode_xyz("elec1_1atom.xyz")#,trans=[0,0,-5])
+system.add_electrode_xyz("elec2_1atom.xyz")#,trans=[0,0,5])
 
 #system.add_electrode_xyz('elec1_1layer.xyz',trans=[0,0,-2.5])
 #system.add_electrode_xyz('elec2_1layer.xyz',trans=[0,0,2.5])
@@ -84,16 +84,16 @@ te_negf_wbl = trans.compute_transmission()
 ##########################################################
 #				NEGF - NO WBL
 ##########################################################
-# trans=NEGFsolver(system)
-# trans.set_energy_range(emin=-17,emax=0,nE=250)
+trans=NEGFsolver(system)
+trans.set_energy_range(emin=-17,emax=0,nE=250)
 
-# # set the wbl approx OFF and define the 
-# # surface green function of the electrodes
-# trans.set_wide_band_limit(False)
-# trans.junction.precompute_electrodes_surface_green_function(np.linspace(-18,1,100),eps=1E-2,tol=1E-6,itermax=1E4,identical_electrodes=True)
+# set the wbl approx OFF and define the 
+# surface green function of the electrodes
+trans.set_wide_band_limit(False)
+trans.junction.precompute_electrodes_surface_green_function(np.linspace(-18,1,100),eps=1E-2,tol=1E-6,itermax=1E4,identical_electrodes=True)
 
-# # compute the surface green functions of the electrodes
-# te_negf = trans.compute_transmission()
+# compute the surface green functions of the electrodes
+te_negf = trans.compute_transmission()
 
 
 ##########################################################
@@ -104,8 +104,8 @@ te_negf_wbl = trans.compute_transmission()
 
 plt.semilogy(trans.energies,te_esqc+1e-16,color='grey',linewidth=4,label='ESQC')
 plt.semilogy(trans.energies,te_negf_wbl+1e-16,color='blue',label='NEGF-WBL')
-#plt.semilogy(trans.energies,te_negf+1e-16,color='red',label='NEGF')
-#plt.ylim([1E-6,10])
+plt.semilogy(trans.energies,te_negf+1e-16,color='red',label='NEGF')
+plt.ylim([1E-6,10])
 plt.legend()
 plt.savefig('te.png')
 

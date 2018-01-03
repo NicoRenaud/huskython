@@ -51,7 +51,7 @@ def lowdin(H,S):
 		U[ind,ind] = 1
 		H[:,ind] = 0
 		H[ind,:] = 0
-		print(' \t \t == %d basis function discarded in the Fock matrix \n \t \t ====== ======= ====== ' % len(ind))
+		print((' \t \t == %d basis function discarded in the Fock matrix \n \t \t ====== ======= ====== ' % len(ind)))
 
 
 	V = np.dot(np.dot(U, np.diag(1 / np.sqrt(s))), U.T)

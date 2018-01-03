@@ -6,19 +6,27 @@ import os
 ##############################
 # find and load the library
 ##############################
-path = os.getcwd()
-lib_hkl = ctypes.cdll.LoadLibrary(find_library('/Users/nicolasrenaud/Documents/CODE/myCodes/huskython/husky/hamiltonian/huckel/hkl'))
+path = os.path.dirname(os.path.realpath(__file__))
+libname = path + '/hkl.so'
+if not os.path.isfile(libname):
+	raise FileNotFoundError('%s not found' %libname)
+
+# load the library
+lib_hkl = ctypes.cdll.LoadLibrary(libname)
+
+# strin pointer type
+ctypes_str = ctypes.c_char_p
 
 ############################################################
 # set the argument type for number of orbtitals
 ############################################################
-lib_hkl.compute_nb_orb.argtypes = [ctypes.c_char_p]
+lib_hkl.compute_nb_orb.argtypes = [ctypes_str]
 lib_hkl.compute_nb_orb.restype = ctypes.c_int
 
 ############################################################
 # set the argument type for compute_hamiltonian
 ############################################################
-lib_hkl.compute_huckel_hamiltonian_general.argtypes = [ndpointer(ctypes.c_double), ndpointer(ctypes.c_double), ctypes.c_int, ctypes.c_char_p]
+lib_hkl.compute_huckel_hamiltonian_general.argtypes = [ndpointer(ctypes.c_double), ndpointer(ctypes.c_double), ctypes.c_int, ctypes_str]
 lib_hkl.compute_huckel_hamiltonian_general.restype = None
 
 ############################################################
@@ -48,7 +56,7 @@ def writeInputFileFragment(xyz,param,filename,KHT):
 	# write the positions
 	for i in range(natom):
 		at = xyz[i].symbol
-		x,y,z = map(float,xyz.positions[i,:])
+		x,y,z = list(map(float,xyz.positions[i,:]))
 		f.write('%s\t% f\t% f\t% f\n' %(at,x,y,z) )
 	f.write('////////////////////////////////////////////////////\n\n')
 	f.close()
@@ -78,14 +86,14 @@ def writeInputFileJunction(xyz_central,dict_elec,filename,KHT,hkl_param_file):
 		nat = len(xyz) 
 		for iat in range(nat):
 			at = xyz[iat].symbol
-			x,y,z = map(float,xyz.positions[iat,:])
+			x,y,z = list(map(float,xyz.positions[iat,:]))
 			f.write('%s\t% f\t% f\t% f\n' %(at,x,y,z) )
 
 	#write the molecule positions
 	nat = len(xyz_central)
 	for iat in range(nat):
 		at = xyz_central[iat].symbol
-		x,y,z = map(float,xyz_central.positions[iat,:])
+		x,y,z = list(map(float,xyz_central.positions[iat,:]))
 		f.write('%s\t% f\t% f\t% f\n' %(at,x,y,z) )
 	f.write('////////////////////////////////////////////////////\n\n')
 	f.close()
