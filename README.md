@@ -15,13 +15,11 @@ The installation will compile the huckel dynamic library. For that you must have
 
 Once the installation is done you can use the module as in the following example. In this example we compute the transmission of a 'benzene' molecule using simple electrodes containing only one states per unit cell. 
 
-![junction](./pics/tb/junction.png)
-
 Husky allows to compute the electronic transmission of this system (and any other systems defined similarly) using different theoretical framework. For example the ESQC and NEGF transmission calculated with Husky of the system above is represented below.
 
-![te](./pics/tb/te.png)
+![junction](./pics/tb/junction.png)
 
-As we can see below the ESQC results agree with NEGF calculation including the SGF of the elecrodes. However the WBL approximation leads to slightly different results as expeced. One can also clearly see the quantum interference around E=0 that are so typical of this system.
+
 
 ### Defining the junction geometry
 
@@ -150,5 +148,8 @@ plt.savefig('te.png')
 
 ```
 
+![te](./pics/tb/te.png)
+
+As we can see below the ESQC results agree with NEGF calculation including the SGF of the elecrodes. However the WBL approximation leads to slightly different results as expeced. One can also clearly see the quantum interference around E=0 that are so typical of this system.
 
 
