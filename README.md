@@ -127,6 +127,8 @@ trans.junction.precompute_electrodes_surface_green_function(np.linspace(-8,8,250
 te_negf = trans.compute_transmission()
 ```
 
+The surface green function is plotted by default in the file sgf.png. As we can see below the we obtain here the typical variation of the real (blue) and imaginary (red) part of the sruface green function of these simple electrodes. We can also see why the WBL is sometimes justified. Here the real part of the SGF is null around E=0 and the imaginary part is relatively flat. 
+
 ![sgf](./pics/tb/sgf.png)
 
 ### Plotting the results
@@ -153,3 +155,108 @@ plt.savefig('te.png')
 As we can see below the ESQC results agree with NEGF calculation including the SGF of the elecrodes. However the WBL approximation leads to slightly different results as expeced. One can also clearly see the quantum interference around E=0 that are so typical of this system.
 
 
+## Example: Extended Huckel model of a benzene ring
+
+It is possible to use extended huckel formalism to compute the electronic structure of the molecules and electrodes. We here consider a simple benzene dithiol connected to monoatomic gold electrodes.
+
+![ehmo](./pics/ehmo/junction.png)
+
+### Defining the system 
+
+As for the TB case the first step consists in defining the junction structure. We are here going to import xyz file to define the different parts of the junction and compute its electronic structure using extended huckel theory. This is done via the embedded ```hkl.so``` dynamic library that should be automatically compiled durinf the installation. The xyz files can be found in the directory: ```husky/example/extended_huckel/bdt/```
+
+```python
+from husky.hamiltonian.ElectronicSystem import Junction
+# create the junction 
+system = Junction()
+
+# add the xyz files of the molecule
+system.add_molecule_xyz("./mol.xyz")
+
+# add the xyz of the electrodes
+system.add_electrode_xyz("elec1_1atom.xyz")
+system.add_electrode_xyz("elec2_1atom.xyz")
+
+# write a xyz just to make sure that everything went ok
+system.write_xyz()
+
+# add the exended Huckel parameters
+system.add_huckel_parameters('./CHSAu.param')
+
+# compute the hamiltonians/overlaps using extended huckel theory
+system.compute_matrices_huckel(lowdin_ortho=False)
+
+```
+
+### Transmission with the different methods
+
+Once the system is define we can use the different methods to compute the transmission coefficient. This is identical to the TB case as only the matrices defining the electronic structure of the junctions have changed.
+
+```python
+
+from husky.transport.negf import NEGFsolver
+from husky.transport.esqc import ESQCsolver
+
+
+import matplotlib.pyplot as plt 
+import numpy as np
+
+##########################################################
+#				ESQC
+##########################################################
+
+trans = ESQCsolver(system)
+trans.set_energy_range(emin=-17,emax=0,nE=250)
+
+# compute the TE
+trans.force = True
+trans.debug = True
+trans.eps_prop = 1E-6
+te_esqc = trans.compute_transmission()
+
+
+##########################################################
+#				NEGF - WBL
+##########################################################
+trans=NEGFsolver(system)
+trans.set_energy_range(emin=-17,emax=0,nE=250)
+
+
+# set the wbl approx on and define the ldos of the elctrodes
+trans.set_wide_band_limit(True)
+trans.set_local_dos_electrode(0.5)
+
+# compute the transport properties
+te_negf_wbl = trans.compute_transmission()
+
+
+##########################################################
+#				NEGF - NO WBL
+##########################################################
+trans=NEGFsolver(system)
+trans.set_energy_range(emin=-17,emax=0,nE=250)
+
+# set the wbl approx OFF and define the 
+# surface green function of the electrodes
+trans.set_wide_band_limit(False)
+trans.junction.precompute_electrodes_surface_green_function(np.linspace(-18,1,100),eps=1E-2,tol=1E-6,itermax=1E4,identical_electrodes=True)
+
+# compute the surface green functions of the electrodes
+te_negf = trans.compute_transmission()
+
+
+##########################################################
+#				Plot the results
+##########################################################
+
+#plt.plot(trans.energies,trans.junction.electrodes['0'].nprop_channel)
+
+plt.semilogy(trans.energies,te_esqc+1e-16,color='grey',linewidth=4,label='ESQC')
+plt.semilogy(trans.energies,te_negf_wbl+1e-16,color='blue',label='NEGF-WBL')
+plt.semilogy(trans.energies,te_negf+1e-16,color='red',label='NEGF')
+plt.ylim([1E-16,10])
+plt.legend()
+plt.savefig('te.png')
+
+
+```
